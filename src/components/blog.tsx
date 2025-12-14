@@ -17,7 +17,7 @@ const blogs = [
     title: "Flutter State Management Without Drama: Building with Built-in Tools",
     summary: "Building with built-in tools for Flutter state management.",
     date: "Jun 10",
-    url: "https://medium.com/@AviSharma.exe/flutter-state-management-without-drama-building-with-built-in-tools",
+    url: "https://medium.com/@AviSharma.exe/flutter-state-management-without-drama-building-with-built-in-tools-c69598519351",
   },
 ];
 
@@ -51,7 +51,7 @@ export function Blog() {
                   <CardHeader className="p-4">
                     <div className="space-y-2">
                       <div className="flex justify-between items-start">
-                        <CardTitle className="group-hover:text-primary transition-colors text-xl">
+                        <CardTitle className="text-xl">
                           {blog.title}
                         </CardTitle>
                         <span className="text-sm text-muted-foreground whitespace-nowrap ml-4">

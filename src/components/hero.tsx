@@ -2,7 +2,9 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Github, FileText } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { FiGithub } from "react-icons/fi";
+import { FaMedium } from "react-icons/fa6";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -28,7 +30,7 @@ export function Hero() {
             </p>
           </div>
 
-          <p className="text-lg text-muted-foreground/80 leading-relaxed max-w-xl">
+          <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
            Iced Cappuccino–powered problem solver with a flexible toolbox. If it needs doing, I’ll figure it out and make it happen.
           </p>
 
@@ -40,12 +42,12 @@ export function Hero() {
             </Button>
             <Button variant="outline" size="lg" className="rounded-full" asChild>
               <Link href="https://github.com/AviSharmaaa" target="_blank">
-                <Github className="mr-2 h-4 w-4" /> GitHub
+                <FiGithub className="mr-2 h-4 w-4" /> GitHub
               </Link>
             </Button>
             <Button variant="outline" size="lg" className="rounded-full" asChild>
               <Link href="https://medium.com/@AviSharma.exe" target="_blank">
-                <FileText className="mr-2 h-4 w-4" /> Medium
+                <FaMedium className="mr-2 h-4 w-4" /> Medium
               </Link>
             </Button>
           </div>
@@ -61,7 +63,7 @@ export function Hero() {
             drag
             dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
             dragElastic={0.2}
-            className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-primary/20 shadow-2xl shadow-primary/20 cursor-grab active:cursor-grabbing"
+            className="relative w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-2 border-primary/20 shadow-2xl shadow-primary/30 cursor-grab active:cursor-grabbing"
           >
             <Image
               src="/avatar.svg"

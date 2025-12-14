@@ -5,7 +5,7 @@ import { FiGithub, FiLinkedin } from "react-icons/fi";
 import { RiTwitterXFill } from "react-icons/ri";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
+import { FaMedium } from "react-icons/fa6";
 
 export function Contact() {
   return (
@@ -43,7 +43,7 @@ export function Contact() {
                     <span className="sr-only">X (Twitter)</span>
                 </Link>
                  <Link href="https://medium.com/@AviSharma.exe" target="_blank" className="text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="h-8 w-8" /> {/* Using Mail icon as placeholder for generic contact/medium since email isn't explicit */}
+                    <FaMedium className="h-8 w-8" /> {/* Using Mail icon as placeholder for generic contact/medium since email isn't explicit */}
                     <span className="sr-only">Medium</span>
                 </Link>
             </motion.div>

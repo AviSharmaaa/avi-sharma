@@ -17,7 +17,7 @@
   --secondary: #33395C;
   --secondary-foreground: #FFFFFF;
   --muted: #1a1a1a;
-  --muted-foreground: #a0a0a0;
+  --muted-foreground: #eee9e9;
   --accent: #3453FD;
   --accent-foreground: #FFFFFF;
   --destructive: oklch(0.5 0.2 25);
@@ -81,6 +81,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent text-foreground;
   }
 }
