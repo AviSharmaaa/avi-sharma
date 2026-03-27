@@ -1,53 +1,33 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-sans: var(--font-geist-sans);
+  --font-display: var(--font-rajdhani);
+  --font-body: var(--font-hind);
+  --font-accent: var(--font-playfair);
   --font-mono: var(--font-geist-mono);
 }
 
 :root {
-  --background: #020202;
-  --foreground: #F6F3F4;
-  --card: #0a0a0a;
-  --card-foreground: #F6F3F4;
-  --popover: #0a0a0a;
-  --popover-foreground: #F6F3F4;
-  --primary: #3453FD;
-  --primary-foreground: #FFFFFF;
-  --secondary: #33395C;
-  --secondary-foreground: #FFFFFF;
-  --muted: #1a1a1a;
-  --muted-foreground: #eee9e9;
-  --accent: #3453FD;
-  --accent-foreground: #FFFFFF;
+  --background: #080B16;
+  --foreground: #E4E0EE;
+  --card: #10132A;
+  --card-foreground: #E4E0EE;
+  --popover: #10132A;
+  --popover-foreground: #E4E0EE;
+  --primary: #E94560;
+  --primary-foreground: #080B16;
+  --secondary: #533483;
+  --secondary-foreground: #E4E0EE;
+  --muted: #141830;
+  --muted-foreground: #A8A3B8;
+  --accent: #30E3CA;
+  --accent-foreground: #080B16;
   --destructive: oklch(0.5 0.2 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: #1f1f1f;
-  --input: #1f1f1f;
-  --ring: #3453FD;
-  --radius: 1rem;
-}
-
-.dark {
-  --background: oklch(0.12 0 0);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.15 0 0);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.15 0 0);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.1 0 0);
-  --secondary: oklch(0.20 0 0);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.20 0 0);
-  --muted-foreground: oklch(0.65 0 0);
-  --accent: oklch(0.20 0 0);
-  --accent-foreground: oklch(0.98 0 0);
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.25 0 0);
-  --input: oklch(0.25 0 0);
-  --ring: oklch(0.8 0 0);
+  --border: #1E2245;
+  --input: #141830;
+  --ring: #E94560;
+  --radius: 0rem;
 }
 
 @theme inline {
@@ -70,10 +50,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 0rem;
+  --radius-md: 0rem;
+  --radius-lg: 0rem;
+  --radius-xl: 0rem;
 }
 
 @layer base {
@@ -81,6 +61,152 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-transparent text-foreground;
+    @apply bg-background text-foreground;
+    background-color: #080B16;
   }
+
+  @media (hover: hover) and (pointer: fine) {
+    body,
+    a,
+    button,
+    [role="button"] {
+      cursor: none !important;
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   Grain overlay — cinematic texture
+   ═══════════════════════════════════════════ */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+}
+
+/* ═══════════════════════════════════════════
+   Vivid shimmer gradient text
+   ═══════════════════════════════════════════ */
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gold-shimmer {
+  background: linear-gradient(
+    135deg,
+    #E94560 0%,
+    #30E3CA 30%,
+    #A78BFA 55%,
+    #30E3CA 75%,
+    #E94560 100%
+  );
+  background-size: 250% 250%;
+  animation: shimmer 4s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══════════════════════════════════════════
+   Chapter watermark — giant ghost numbers
+   ═══════════════════════════════════════════ */
+.chapter-watermark {
+  position: absolute;
+  font-family: var(--font-playfair), serif;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 0.8;
+  color: rgba(48, 227, 202, 0.04);
+  pointer-events: none;
+  user-select: none;
+  letter-spacing: -0.04em;
+}
+
+/* ═══════════════════════════════════════════
+   Scroll indicator pulse
+   ═══════════════════════════════════════════ */
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.4; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(8px); }
+}
+
+.scroll-indicator {
+  animation: scroll-pulse 2.5s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════
+   Accent line — horizontal rule
+   ═══════════════════════════════════════════ */
+.accent-line {
+  height: 1px;
+  background: linear-gradient(to right, #E94560, #30E3CA 40%, transparent);
+}
+
+.accent-line-center {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #30E3CA 40%, #30E3CA 60%, transparent);
+}
+
+/* ═══════════════════════════════════════════
+   Editorial card — clean with subtle border
+   ═══════════════════════════════════════════ */
+.story-card {
+  border: 1px solid rgba(48, 227, 202, 0.1);
+  background: rgba(16, 19, 42, 0.7);
+  backdrop-filter: blur(8px);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.story-card:hover {
+  border-color: rgba(48, 227, 202, 0.3);
+  box-shadow:
+    0 0 40px rgba(233, 69, 96, 0.06),
+    0 0 0 1px rgba(48, 227, 202, 0.08);
+}
+
+/* ═══════════════════════════════════════════
+   Dot grid subtle pattern
+   ═══════════════════════════════════════════ */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(48, 227, 202, 0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ═══════════════════════════════════════════
+   Marquee track
+   ═══════════════════════════════════════════ */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track { animation: marquee 28s linear infinite; }
+
+/* ═══════════════════════════════════════════
+   Angled button clip-path
+   ═══════════════════════════════════════════ */
+.btn-angled {
+  clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+}
+
+/* ═══════════════════════════════════════════
+   Section divider with diamond
+   ═══════════════════════════════════════════ */
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(48, 227, 202, 0.2), transparent);
 }

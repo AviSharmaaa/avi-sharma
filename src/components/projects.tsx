@@ -1,107 +1,147 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Github } from "lucide-react";
+import { useRef } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useMotionTemplate,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import Link from "next/link";
-import { motion } from "framer-motion";
-import { TiltCard } from "@/components/ui/tilt-card";
 
 const projects = [
-  {
-    name: "Http Server",
-    description: "Production-ready HTTP/HTTPS server implemented using raw TCP sockets to understand web frameworks under the hood.",
-    language: "TypeScript",
-    url: "https://github.com/AviSharmaaa/http-server",
-  },
-  {
-    name: "Cursor Chase",
-    description: "A Next.js game involving cursor interactions where players collect orbs while avoiding a chaser.",
-    language: "TypeScript",
-    url: "https://github.com/AviSharmaaa/cursor-chase",
-  },
-  {
-    name: "Light the Gains",
-    description: "A Python-based portfolio tracker that connects stock performance to a Tuya Wi-Fi light bulb, visualizing gains and losses in real-time.",
-    language: "Python",
-    url: "https://github.com/AviSharmaaa/light_the_gains",
-  },
-  {
-    name: "State without drama",
-    description: "A Flutter project to implement state management without using any 3rd party libraries.",
-    language: "Flutter",
-    url: "https://github.com/AviSharmaaa/state_without_drama",
-  },
+  { number: "01", name: "FAAA", description: "VS Code extension that plays a sound whenever a terminal command fails. Uses VS Code's Shell Integration to detect non-zero exit codes.", language: "TypeScript", languageColor: "#3178C6", stars: 9, url: "https://github.com/AviSharmaaa/faaa", liveUrl: "https://open-vsx.org/extension/AviSharma/faaa" },
+  { number: "02", name: "Http Server", description: "HTTP/HTTPS server built from raw TCP and TLS sockets — routing, middleware, compression, and security without any framework.", language: "TypeScript", languageColor: "#3178C6", stars: 1, url: "https://github.com/AviSharmaaa/http-server" },
+  { number: "03", name: "Cursor Chase", description: "Browser game where you collect orbs while dodging an AI cursor chaser. Built with Next.js and Framer Motion.", language: "TypeScript", languageColor: "#3178C6", stars: 0, url: "https://github.com/AviSharmaaa/cursor-chase", liveUrl: "https://cursor-chase-sage.vercel.app/" },
+  { number: "04", name: "Light the Gains", description: "Stock portfolio tracker that syncs live market data with a Tuya smart bulb — green for gains, red for losses. Auto-refreshes every 10 minutes.", language: "Python", languageColor: "#3572A5", stars: 1, url: "https://github.com/AviSharmaaa/light_the_gains" },
+  { number: "05", name: "Nimbus", description: "Animated ASCII weather app for the terminal. Renders dynamic rain, snow, and sunshine scenes using curses with real-time data from wttr.in.", language: "Python", languageColor: "#3572A5", stars: 0, url: "https://github.com/AviSharmaaa/nimbus" },
+  { number: "06", name: "Hands Off Village", description: "ADB-based automation for Clash of Clans — keeps the screen awake and collects resources at fixed intervals, no root required.", language: "Shell", languageColor: "#89E051", stars: 0, url: "https://github.com/AviSharmaaa/hands-off-village" },
 ];
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
+type Project = (typeof projects)[number] & { liveUrl?: string };
 
-const item = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0 }
-};
+function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const rotateX = useMotionValue(0);
+  const rotateY = useMotionValue(0);
+  const glareX = useMotionValue(50);
+  const glareY = useMotionValue(50);
+  const springRotateX = useSpring(rotateX, { stiffness: 200, damping: 20 });
+  const springRotateY = useSpring(rotateY, { stiffness: 200, damping: 20 });
+  const glareBackground = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(48,227,202,0.12) 0%, transparent 65%)`;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    rotateX.set((-(e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)) * 12);
+    rotateY.set(((e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)) * 12);
+    glareX.set(((e.clientX - rect.left) / rect.width) * 100);
+    glareY.set(((e.clientY - rect.top) / rect.height) * 100);
+  };
+  const handleMouseLeave = () => { rotateX.set(0); rotateY.set(0); glareX.set(50); glareY.set(50); };
+  const fromLeft = index % 2 === 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: fromLeft ? -60 : 60 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.9, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      style={{ perspective: "1000px" }}
+    >
+      <motion.div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ rotateX: springRotateX, rotateY: springRotateY, transformStyle: "preserve-3d" }}
+        className="group relative story-card p-7 h-full flex flex-col cursor-pointer"
+        onClick={() => window.open(project.url, "_blank")}
+      >
+        <motion.div style={{ background: glareBackground }} className="absolute inset-0 pointer-events-none" />
+
+        <div className="flex items-start justify-between mb-6">
+          <span className="font-accent font-black italic text-[#E94560]/15 leading-none tracking-tight select-none" style={{ fontSize: "clamp(3rem, 5vw, 4.5rem)" }}>
+            {project.number}
+          </span>
+          <div className="flex flex-col items-end gap-2 mt-2">
+            <span className="font-mono text-xs tracking-wider px-3 py-1" style={{ border: `1px solid ${project.languageColor}25`, color: project.languageColor, background: `${project.languageColor}08` }}>
+              {project.language}
+            </span>
+            {project.stars > 0 && (
+              <span className="flex items-center gap-1 font-mono text-xs text-[#30E3CA] tracking-wide">
+                <svg className="w-3 h-3 fill-[#30E3CA]" viewBox="0 0 16 16">
+                  <path d="M8 .25a.75.75 0 01.673.418l1.882 3.815 4.21.612a.75.75 0 01.416 1.279l-3.046 2.97.719 4.192a.75.75 0 01-1.088.791L8 12.347l-3.766 1.98a.75.75 0 01-1.088-.79l.72-4.194L.836 6.374a.75.75 0 01.416-1.28l4.21-.611L7.327.668A.75.75 0 018 .25z" />
+                </svg>
+                {project.stars}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <h3 className="font-display font-bold uppercase tracking-tight mb-3 text-[#E4E0EE] group-hover:text-[#30E3CA] transition-colors duration-400" style={{ fontSize: "clamp(1.3rem, 2.5vw, 1.8rem)" }}>
+          {project.name}
+        </h3>
+
+        <p className="font-body text-[#A8A3B8] text-sm leading-relaxed flex-1 mb-6">
+          {project.description}
+        </p>
+
+        <div className="flex items-center gap-5">
+          <span className="flex items-center gap-2 text-[#FF6B81] font-display text-xs uppercase tracking-[0.25em] group-hover:gap-4 transition-all duration-300">
+            View Source
+            <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 14 14" fill="none">
+              <path d="M2 7 L12 7 M8 3 L12 7 L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          {project.liveUrl && (
+            <Link href={project.liveUrl} target="_blank" onClick={(e) => e.stopPropagation()} className="relative z-10 flex items-center gap-2 text-[#30E3CA] font-display text-xs uppercase tracking-[0.25em] hover:text-[#E4E0EE] transition-colors duration-300">
+              Try It
+              <svg className="w-3 h-3" viewBox="0 0 14 14" fill="none">
+                <path d="M3 11 L11 3 M5 3 L11 3 L11 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
 
 export function Projects() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "start center"] });
+  const headingY = useTransform(scrollYProgress, [0, 1], [80, 0]);
+  const headingOpacity = useTransform(scrollYProgress, [0, 0.6], [0, 1]);
+
   return (
-    <section id="projects" className="py-20 container max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col space-y-8">
-        <div className="flex items-center justify-between">
-         <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">Open Source</h2>
-          <p className="text-muted-foreground max-w-2xl text-lg">
-            A collection of projects I&apos;ve built to explore new technologies and solve interesting problems.
-          </p>
-        </div>
-          <Button variant="ghost" asChild className="hidden sm:flex">
-            <Link href="https://github.com/AviSharmaaa" target="_blank">
-              View all on GitHub <ArrowRight className="ml-2 h-4 w-4" />
+    <section id="projects" ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden flex flex-col justify-center">
+      <div aria-hidden className="chapter-watermark" style={{ fontSize: "clamp(10rem, 22vw, 22rem)", top: "-0.15em", right: "-0.05em" }}>01</div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+        <motion.div style={{ y: headingY, opacity: headingOpacity }} className="mb-20">
+          <div className="flex items-center gap-4 mb-4">
+            <span className="font-mono text-xs tracking-wider text-[#8B87A0]">CHAPTER I</span>
+            <div className="accent-line flex-1 max-w-24" />
+          </div>
+          <div className="flex items-end justify-between gap-8 flex-wrap">
+            <h2 className="font-accent font-black italic leading-[0.9] tracking-tight text-[#E4E0EE]" style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}>Things I Built</h2>
+            <Link href="https://github.com/AviSharmaaa" target="_blank" className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 font-display text-sm uppercase tracking-[0.18em] border border-[#30E3CA]/25 text-[#30E3CA] hover:border-[#30E3CA] hover:text-[#E4E0EE] transition-colors duration-300 mb-2">
+              View All on GitHub
+              <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none"><path d="M2 7 L12 7 M8 3 L12 7 L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
-          </Button>
+          </div>
+          <div className="accent-line mt-6 w-full" />
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project, i) => (<ProjectCard key={project.name} project={project} index={i} />))}
         </div>
-        
-        <motion.div 
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          {projects.map((project) => (
-            <motion.div key={project.name} variants={item}>
-              <TiltCard className="h-full">
-                <Card className="h-full flex flex-col hover:border-foreground/50 transition-colors bg-card/50 backdrop-blur-sm">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-xl">{project.name}</CardTitle>
-                      <Badge variant="secondary">{project.language}</Badge>
-                    </div>
-                    <CardDescription className="text-base pt-2">
-                      {project.description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-grow">
-                    {/* Additional content could go here */}
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" size="sm" asChild className="w-full">
-                      <Link href={project.url} target="_blank">
-                        <Github className="mr-2 h-4 w-4" /> View Source
-                      </Link>
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </TiltCard>
-            </motion.div>
-          ))}
+
+        <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10 sm:hidden">
+          <Link href="https://github.com/AviSharmaaa" target="_blank" className="flex items-center justify-center gap-2 py-3.5 font-display text-sm uppercase tracking-[0.18em] border border-[#30E3CA]/35 text-[#30E3CA] w-full">View All on GitHub</Link>
         </motion.div>
       </div>
     </section>
