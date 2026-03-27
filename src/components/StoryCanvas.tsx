@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 
 const COUNT = 28000;
 const SHAPE_RATIO = 0.88;
-const S = 1.8; // global shape scale
+const S = 1.2; // global shape scale
 
 /* ─── helpers ─── */
 
@@ -13,277 +13,108 @@ function smoothstep(edge0: number, edge1: number, x: number) {
   return t * t * (3 - 2 * t);
 }
 
-/* ─── shape generators ─── */
+/* ─── shape: Sudarshan Chakra (Krishna's divine disc) ─── */
 
-function cpuShape(n: number): Float32Array {
+function chakraShape(n: number): Float32Array {
   const p = new Float32Array(n * 3);
   const sn = Math.floor(n * SHAPE_RATIO);
   let i = 0;
-  const W = 1.1 * S;
 
-  // Body outline (16 %)
-  const bodyN = Math.floor(sn * 0.16);
-  for (let k = 0; k < bodyN; k++) {
-    const t = Math.random();
-    const side = (Math.random() * 4) | 0;
-    const jitter = (Math.random() - 0.5) * 0.02;
-    switch (side) {
-      case 0: p[i] = (t * 2 - 1) * W; p[i+1] = W + jitter;  break;
-      case 1: p[i] = (t * 2 - 1) * W; p[i+1] = -W + jitter; break;
-      case 2: p[i] = -W + jitter; p[i+1] = (t * 2 - 1) * W;  break;
-      default: p[i] = W + jitter; p[i+1] = (t * 2 - 1) * W;  break;
-    }
-    p[i+2] = (Math.random() - 0.5) * 0.06;
+  const outerR = 1.6 * S;
+  const innerR = 1.2 * S;
+  const hubR = 0.35 * S;
+  const spokes = 12;
+
+  // Outer ring (20 %)
+  const outerN = Math.floor(sn * 0.20);
+  for (let k = 0; k < outerN; k++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = outerR + (Math.random() - 0.5) * 0.06;
+    p[i]   = Math.cos(a) * r;
+    p[i+1] = Math.sin(a) * r;
+    p[i+2] = (Math.random() - 0.5) * 0.05;
     i += 3;
   }
 
-  // Body fill (14 %)
-  const fillN = Math.floor(sn * 0.14);
-  for (let k = 0; k < fillN; k++) {
-    p[i] = (Math.random() * 2 - 1) * W;
-    p[i+1] = (Math.random() * 2 - 1) * W;
-    p[i+2] = (Math.random() - 0.5) * 0.06;
-    i += 3;
-  }
-
-  // Pins (28 %)
-  const pinN = Math.floor(sn * 0.28);
-  const pinsPerSide = 16;
-  const pinLen = 0.35 * S;
-  for (let k = 0; k < pinN; k++) {
-    const side = (Math.random() * 4) | 0;
-    const idx = Math.floor(Math.random() * pinsPerSide);
-    const pos = ((idx + 0.5) / pinsPerSide * 2 - 1) * W * 0.88;
-    const ext = W + Math.random() * pinLen;
-    const jt = (Math.random() - 0.5) * 0.018;
-    switch (side) {
-      case 0: p[i] = pos + jt; p[i+1] = ext;  break;
-      case 1: p[i] = pos + jt; p[i+1] = -ext; break;
-      case 2: p[i] = -ext; p[i+1] = pos + jt; break;
-      default: p[i] = ext;  p[i+1] = pos + jt; break;
-    }
+  // Inner ring (14 %)
+  const innerN = Math.floor(sn * 0.14);
+  for (let k = 0; k < innerN; k++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = innerR + (Math.random() - 0.5) * 0.05;
+    p[i]   = Math.cos(a) * r;
+    p[i+1] = Math.sin(a) * r;
     p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
-  // Die – inner square with grid (26 %)
-  const dieW = 0.52 * S;
-  const dieN = Math.floor(sn * 0.26);
-  for (let k = 0; k < dieN; k++) {
-    if (Math.random() < 0.25) {
-      const t = Math.random();
-      const side = (Math.random() * 4) | 0;
-      switch (side) {
-        case 0: p[i] = (t * 2 - 1) * dieW; p[i+1] = dieW;  break;
-        case 1: p[i] = (t * 2 - 1) * dieW; p[i+1] = -dieW; break;
-        case 2: p[i] = -dieW; p[i+1] = (t * 2 - 1) * dieW; break;
-        default: p[i] = dieW;  p[i+1] = (t * 2 - 1) * dieW; break;
-      }
+  // Serrated edge — triangular teeth around outer rim (16 %)
+  const teethN = Math.floor(sn * 0.16);
+  const toothCount = 24;
+  for (let k = 0; k < teethN; k++) {
+    const ti = Math.floor(Math.random() * toothCount);
+    const baseA = (ti / toothCount) * Math.PI * 2;
+    const tipA = ((ti + 0.5) / toothCount) * Math.PI * 2;
+    const t = Math.random();
+    const tipR = outerR + 0.28 * S;
+    if (t < 0.5) {
+      // Edge of tooth
+      const s = Math.random();
+      const a = baseA + (tipA - baseA) * s;
+      const r = outerR + (tipR - outerR) * s;
+      p[i]   = Math.cos(a) * r + (Math.random() - 0.5) * 0.02;
+      p[i+1] = Math.sin(a) * r + (Math.random() - 0.5) * 0.02;
     } else {
-      const gx = Math.floor(Math.random() * 7);
-      const gy = Math.floor(Math.random() * 7);
-      p[i]   = ((gx + 0.5) / 7 * 2 - 1) * dieW * 0.85 + (Math.random() - 0.5) * 0.035;
-      p[i+1] = ((gy + 0.5) / 7 * 2 - 1) * dieW * 0.85 + (Math.random() - 0.5) * 0.035;
+      const s = Math.random();
+      const nextA = ((ti + 1) / toothCount) * Math.PI * 2;
+      const a = tipA + (nextA - tipA) * s;
+      const r = tipR - (tipR - outerR) * s;
+      p[i]   = Math.cos(a) * r + (Math.random() - 0.5) * 0.02;
+      p[i+1] = Math.sin(a) * r + (Math.random() - 0.5) * 0.02;
     }
     p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
-  // Corner dot + remaining
-  while (i / 3 < sn) {
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * 0.12 * S;
-    p[i]   = -W * 0.72 + Math.cos(a) * r;
-    p[i+1] = W * 0.72 + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.03;
-    i += 3;
-  }
-
-  // Scatter — distributed in a soft sphere
-  while (i / 3 < n) {
-    const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
-    const th = Math.random() * Math.PI * 2;
-    const ph = Math.acos(Math.random() * 2 - 1);
-    p[i] = r * Math.sin(ph) * Math.cos(th);
-    p[i+1] = r * Math.sin(ph) * Math.sin(th);
-    p[i+2] = r * Math.cos(ph);
-    i += 3;
-  }
-  return p;
-}
-
-function graphShape(n: number): Float32Array {
-  const p = new Float32Array(n * 3);
-  const sn = Math.floor(n * SHAPE_RATIO);
-  let i = 0;
-
-  const nodeCount = 8;
-  const ringR = 1.4 * S;
-  const nodeR = 0.24 * S;
-  const nodes: [number, number][] = [];
-  for (let k = 0; k < nodeCount; k++) {
-    const a = (k / nodeCount) * Math.PI * 2 - Math.PI / 2;
-    nodes.push([Math.cos(a) * ringR, Math.sin(a) * ringR]);
-  }
-
-  // Edges – cycle (32 %)
-  const edgeN = Math.floor(sn * 0.32);
-  for (let k = 0; k < edgeN; k++) {
-    const ei = Math.floor(Math.random() * nodeCount);
-    const ni = (ei + 1) % nodeCount;
+  // Spokes — lines from hub to inner ring (18 %)
+  const spokeN = Math.floor(sn * 0.18);
+  for (let k = 0; k < spokeN; k++) {
+    const si = Math.floor(Math.random() * spokes);
+    const a = (si / spokes) * Math.PI * 2;
     const t = Math.random();
-    p[i]   = nodes[ei][0] + (nodes[ni][0] - nodes[ei][0]) * t + (Math.random() - 0.5) * 0.03;
-    p[i+1] = nodes[ei][1] + (nodes[ni][1] - nodes[ei][1]) * t + (Math.random() - 0.5) * 0.03;
+    const r = hubR + (innerR - hubR) * t;
+    p[i]   = Math.cos(a) * r + (Math.random() - 0.5) * 0.025;
+    p[i+1] = Math.sin(a) * r + (Math.random() - 0.5) * 0.025;
     p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
-  // Cross edges (16 %)
-  const crossEdges: [number, number][] = [[0, 3], [1, 5], [2, 6], [3, 7], [4, 7], [1, 6]];
-  const crossN = Math.floor(sn * 0.16);
-  for (let k = 0; k < crossN; k++) {
-    const ce = crossEdges[Math.floor(Math.random() * crossEdges.length)];
-    const t = Math.random();
-    p[i]   = nodes[ce[0]][0] + (nodes[ce[1]][0] - nodes[ce[0]][0]) * t + (Math.random() - 0.5) * 0.025;
-    p[i+1] = nodes[ce[0]][1] + (nodes[ce[1]][1] - nodes[ce[0]][1]) * t + (Math.random() - 0.5) * 0.025;
-    p[i+2] = (Math.random() - 0.5) * 0.04;
-    i += 3;
-  }
-
-  // Node circles – outline (18 %)
-  const nOutN = Math.floor(sn * 0.18);
-  for (let k = 0; k < nOutN; k++) {
-    const ni = Math.floor(Math.random() * nodeCount);
-    const a = Math.random() * Math.PI * 2;
-    const r = nodeR + (Math.random() - 0.5) * 0.025;
-    p[i]   = nodes[ni][0] + Math.cos(a) * r;
-    p[i+1] = nodes[ni][1] + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.04;
-    i += 3;
-  }
-
-  // Node circles – fill (22 %)
-  const nFillN = Math.floor(sn * 0.22);
-  for (let k = 0; k < nFillN; k++) {
-    const ni = Math.floor(Math.random() * nodeCount);
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * nodeR * 0.8;
-    p[i]   = nodes[ni][0] + Math.cos(a) * r;
-    p[i+1] = nodes[ni][1] + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.05;
-    i += 3;
-  }
-
-  // Remaining – node centers
-  while (i / 3 < sn) {
-    const ni = Math.floor(Math.random() * nodeCount);
-    p[i]   = nodes[ni][0] + (Math.random() - 0.5) * 0.05;
-    p[i+1] = nodes[ni][1] + (Math.random() - 0.5) * 0.05;
-    p[i+2] = (Math.random() - 0.5) * 0.03;
-    i += 3;
-  }
-
-  while (i / 3 < n) {
-    const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
-    const th = Math.random() * Math.PI * 2;
-    const ph = Math.acos(Math.random() * 2 - 1);
-    p[i] = r * Math.sin(ph) * Math.cos(th);
-    p[i+1] = r * Math.sin(ph) * Math.sin(th);
-    p[i+2] = r * Math.cos(ph);
-    i += 3;
-  }
-  return p;
-}
-
-function coffeeMugShape(n: number): Float32Array {
-  const p = new Float32Array(n * 3);
-  const sn = Math.floor(n * SHAPE_RATIO);
-  let i = 0;
-
-  const mW = 0.85 * S;
-  const mH = 1.25 * S;
-  const mB = -0.8 * S;
-
-  // Body outline (20 %)
-  const outN = Math.floor(sn * 0.20);
-  for (let k = 0; k < outN; k++) {
-    const t = Math.random();
-    const side = (Math.random() * 4) | 0;
-    switch (side) {
-      case 0: p[i] = -mW + t * 0.06 * S; p[i+1] = mB + t * mH; break;
-      case 1: p[i] = mW - t * 0.06 * S;  p[i+1] = mB + t * mH; break;
-      case 2: p[i] = (Math.random() * 2 - 1) * mW; p[i+1] = mB; break;
-      default: p[i] = (Math.random() * 2 - 1) * (mW + 0.04 * S); p[i+1] = mB + mH; break;
-    }
-    p[i+2] = (Math.random() - 0.5) * 0.05;
-    i += 3;
-  }
-
-  // Body fill (20 %)
-  const fillN = Math.floor(sn * 0.20);
+  // Ring fill between inner and outer (12 %)
+  const fillN = Math.floor(sn * 0.12);
   for (let k = 0; k < fillN; k++) {
-    p[i]   = (Math.random() * 2 - 1) * mW;
-    p[i+1] = mB + Math.random() * mH;
-    p[i+2] = (Math.random() - 0.5) * 0.06;
-    i += 3;
-  }
-
-  // Coffee surface (8 %)
-  const coffeeY = mB + mH * 0.82;
-  const coffeeN = Math.floor(sn * 0.08);
-  for (let k = 0; k < coffeeN; k++) {
-    p[i]   = (Math.random() * 2 - 1) * mW * 0.88;
-    p[i+1] = coffeeY + (Math.random() - 0.5) * 0.04;
-    p[i+2] = (Math.random() - 0.5) * 0.03;
-    i += 3;
-  }
-
-  // Handle – C curve (20 %)
-  const hN = Math.floor(sn * 0.20);
-  const hCx = mW + 0.38 * S;
-  const hCy = mB + mH * 0.48;
-  const hRx = 0.38 * S, hRy = 0.42 * S;
-  for (let k = 0; k < hN; k++) {
-    const a = -Math.PI * 0.5 + Math.random() * Math.PI;
-    const rr = 1 + (Math.random() - 0.5) * 0.14;
-    p[i]   = hCx + Math.cos(a) * hRx * rr;
-    p[i+1] = hCy + Math.sin(a) * hRy * rr;
+    const a = Math.random() * Math.PI * 2;
+    const r = innerR + Math.random() * (outerR - innerR);
+    p[i]   = Math.cos(a) * r;
+    p[i+1] = Math.sin(a) * r;
     p[i+2] = (Math.random() - 0.5) * 0.05;
     i += 3;
   }
 
-  // Steam – 3 wavy lines (16 %)
-  const steamN = Math.floor(sn * 0.16);
-  for (let k = 0; k < steamN; k++) {
-    const line = Math.floor(Math.random() * 3);
-    const bx = (-0.35 + line * 0.35) * S;
-    const t = Math.random();
-    const y = mB + mH + 0.15 * S + t * 0.85 * S;
-    const wx = Math.sin(t * Math.PI * 2.5 + line * 1.8) * 0.14 * S;
-    p[i]   = bx + wx + (Math.random() - 0.5) * 0.035;
-    p[i+1] = y + (Math.random() - 0.5) * 0.025;
-    p[i+2] = (Math.random() - 0.5) * 0.04;
-    i += 3;
-  }
-
-  // Rim + base
+  // Hub — filled center circle
   while (i / 3 < sn) {
-    if (Math.random() < 0.6) {
-      p[i] = (Math.random() * 2 - 1) * (mW + 0.04 * S);
-      p[i+1] = mB + mH + (Math.random() - 0.5) * 0.06 * S;
-    } else {
-      p[i] = (Math.random() * 2 - 1) * (mW + 0.02 * S);
-      p[i+1] = mB + (Math.random() - 0.5) * 0.06 * S;
-    }
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.random() * hubR;
+    p[i]   = Math.cos(a) * r;
+    p[i+1] = Math.sin(a) * r;
     p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
+  // Scatter
   while (i / 3 < n) {
     const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(Math.random() * 2 - 1);
-    p[i] = r * Math.sin(ph) * Math.cos(th);
+    p[i]   = r * Math.sin(ph) * Math.cos(th);
     p[i+1] = r * Math.sin(ph) * Math.sin(th);
     p[i+2] = r * Math.cos(ph);
     i += 3;
@@ -291,114 +122,325 @@ function coffeeMugShape(n: number): Float32Array {
   return p;
 }
 
-function headphoneShape(n: number): Float32Array {
+/* ─── shape: Trishul (Shiva's trident) ─── */
+
+function trishulShape(n: number): Float32Array {
   const p = new Float32Array(n * 3);
   const sn = Math.floor(n * SHAPE_RATIO);
   let i = 0;
 
-  const cupR = 0.64 * S;
-  const cupX = 1.2 * S;
-  const cupY = -0.35 * S;
+  const shaftH = 2.8 * S;
+  const shaftB = -1.4 * S;
+  const shaftW = 0.06 * S;
+  const prongH = 1.0 * S;
+  const prongTop = shaftB + shaftH;
+  const sideSpread = 0.7 * S;
 
-  // Left cup outline (10 %)
-  const cOutN = Math.floor(sn * 0.10);
-  for (let k = 0; k < cOutN; k++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = cupR + (Math.random() - 0.5) * 0.035;
-    p[i] = -cupX + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.05;
-    i += 3;
-  }
-
-  // Left cup fill (10 %)
-  const cFillN = Math.floor(sn * 0.10);
-  for (let k = 0; k < cFillN; k++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * cupR * 0.85;
-    p[i] = -cupX + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.06;
-    i += 3;
-  }
-
-  // Right cup outline (10 %)
-  const cOutN2 = Math.floor(sn * 0.10);
-  for (let k = 0; k < cOutN2; k++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = cupR + (Math.random() - 0.5) * 0.035;
-    p[i] = cupX + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.05;
-    i += 3;
-  }
-
-  // Right cup fill (10 %)
-  const cFillN2 = Math.floor(sn * 0.10);
-  for (let k = 0; k < cFillN2; k++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = Math.random() * cupR * 0.85;
-    p[i] = cupX + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.06;
-    i += 3;
-  }
-
-  // Headband arc (24 %)
-  const bandN = Math.floor(sn * 0.24);
-  for (let k = 0; k < bandN; k++) {
+  // Main shaft (22 %)
+  const shaftN = Math.floor(sn * 0.22);
+  for (let k = 0; k < shaftN; k++) {
     const t = Math.random();
-    const x = -cupX + t * 2 * cupX;
-    const y = cupY + cupR + Math.sin(Math.PI * t) * 1.0 * S;
-    const th = (Math.random() - 0.5) * 0.08 * S;
-    p[i]   = x + (Math.random() - 0.5) * 0.025;
-    p[i+1] = y + th;
-    p[i+2] = (Math.random() - 0.5) * 0.05;
-    i += 3;
-  }
-
-  // Cushion inner rings (14 %)
-  const cushN = Math.floor(sn * 0.14);
-  for (let k = 0; k < cushN; k++) {
-    const isLeft = Math.random() < 0.5;
-    const cx = isLeft ? -cupX : cupX;
-    const a = Math.random() * Math.PI * 2;
-    const r = cupR * (0.36 + Math.random() * 0.16);
-    p[i]   = cx + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
+    p[i]   = (Math.random() - 0.5) * shaftW * 2;
+    p[i+1] = shaftB + t * shaftH;
     p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
-  // Cup padding (12 %)
-  const padN = Math.floor(sn * 0.12);
-  for (let k = 0; k < padN; k++) {
-    const isLeft = Math.random() < 0.5;
-    const cx = isLeft ? -cupX : cupX;
-    const a = Math.random() * Math.PI * 2;
-    const inner = cupR * 0.88, outer = cupR * 1.1;
-    const r = inner + Math.random() * (outer - inner);
-    p[i]   = cx + Math.cos(a) * r;
-    p[i+1] = cupY + Math.sin(a) * r;
-    p[i+2] = (Math.random() - 0.5) * 0.05;
+  // Center prong (18 %)
+  const centerN = Math.floor(sn * 0.18);
+  for (let k = 0; k < centerN; k++) {
+    const t = Math.random();
+    // Tapers toward tip
+    const w = shaftW * 2 * (1 - t * 0.7);
+    p[i]   = (Math.random() - 0.5) * w;
+    p[i+1] = prongTop + t * prongH;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
     i += 3;
   }
 
-  // Band-to-cup connectors
+  // Left prong — curved outward (16 %)
+  const leftN = Math.floor(sn * 0.16);
+  for (let k = 0; k < leftN; k++) {
+    const t = Math.random();
+    const curve = Math.sin(t * Math.PI * 0.5) * sideSpread;
+    const w = shaftW * (1 - t * 0.6);
+    p[i]   = -curve + (Math.random() - 0.5) * w * 2;
+    p[i+1] = prongTop + t * prongH * 0.85;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Right prong — curved outward (16 %)
+  const rightN = Math.floor(sn * 0.16);
+  for (let k = 0; k < rightN; k++) {
+    const t = Math.random();
+    const curve = Math.sin(t * Math.PI * 0.5) * sideSpread;
+    const w = shaftW * (1 - t * 0.6);
+    p[i]   = curve + (Math.random() - 0.5) * w * 2;
+    p[i+1] = prongTop + t * prongH * 0.85;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Crescent / guard where prongs meet shaft (12 %)
+  const guardN = Math.floor(sn * 0.12);
+  for (let k = 0; k < guardN; k++) {
+    const t = Math.random() * Math.PI;
+    const gw = sideSpread * 0.5;
+    const gh = 0.18 * S;
+    p[i]   = Math.cos(t) * gw + (Math.random() - 0.5) * 0.03;
+    p[i+1] = prongTop - Math.sin(t) * gh + (Math.random() - 0.5) * 0.03;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Damaru (small drum below guard) (8 %)
+  const damaruN = Math.floor(sn * 0.08);
+  const damaruY = prongTop - 0.3 * S;
+  for (let k = 0; k < damaruN; k++) {
+    const t = Math.random();
+    const y = damaruY - t * 0.25 * S;
+    const w = 0.12 * S * (1 - Math.abs(t - 0.5) * 1.6);
+    p[i]   = (Math.random() - 0.5) * w * 2;
+    p[i+1] = y;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Remaining
   while (i / 3 < sn) {
-    const isLeft = Math.random() < 0.5;
-    const cx = isLeft ? -cupX : cupX;
-    p[i]   = cx + (Math.random() - 0.5) * 0.07;
-    p[i+1] = cupY + cupR + Math.random() * 0.2 * S;
-    p[i+2] = (Math.random() - 0.5) * 0.04;
+    p[i]   = (Math.random() - 0.5) * shaftW;
+    p[i+1] = shaftB + (Math.random() - 0.5) * 0.08 * S;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
     i += 3;
   }
 
+  // Scatter
   while (i / 3 < n) {
     const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
     const th = Math.random() * Math.PI * 2;
     const ph = Math.acos(Math.random() * 2 - 1);
-    p[i] = r * Math.sin(ph) * Math.cos(th);
+    p[i]   = r * Math.sin(ph) * Math.cos(th);
+    p[i+1] = r * Math.sin(ph) * Math.sin(th);
+    p[i+2] = r * Math.cos(ph);
+    i += 3;
+  }
+  return p;
+}
+
+/* ─── shape: Dhanush (Rama's bow with arrow) ─── */
+
+function dhanushShape(n: number): Float32Array {
+  const p = new Float32Array(n * 3);
+  const sn = Math.floor(n * SHAPE_RATIO);
+  let i = 0;
+
+  const bowR = 1.5 * S;
+  const bowAngle = Math.PI * 0.75; // arc sweep
+  const bowStart = Math.PI * 0.625; // start angle (tilted)
+  const bowThick = 0.05 * S;
+
+  // Bow arc — thick curved limb (28 %)
+  const arcN = Math.floor(sn * 0.28);
+  for (let k = 0; k < arcN; k++) {
+    const t = Math.random();
+    const a = bowStart + t * bowAngle;
+    // Thicker at center, thinner at tips
+    const thick = bowThick * (1 + Math.sin(t * Math.PI) * 1.2);
+    const r = bowR + (Math.random() - 0.5) * thick * 2;
+    p[i]   = Math.cos(a) * r;
+    p[i+1] = Math.sin(a) * r;
+    p[i+2] = (Math.random() - 0.5) * 0.05;
+    i += 3;
+  }
+
+  // Bowstring — straight line between tips (12 %)
+  const tipA1 = bowStart;
+  const tipA2 = bowStart + bowAngle;
+  const tip1x = Math.cos(tipA1) * bowR, tip1y = Math.sin(tipA1) * bowR;
+  const tip2x = Math.cos(tipA2) * bowR, tip2y = Math.sin(tipA2) * bowR;
+  const stringN = Math.floor(sn * 0.12);
+  for (let k = 0; k < stringN; k++) {
+    const t = Math.random();
+    p[i]   = tip1x + (tip2x - tip1x) * t + (Math.random() - 0.5) * 0.02;
+    p[i+1] = tip1y + (tip2y - tip1y) * t + (Math.random() - 0.5) * 0.02;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Arrow shaft — from string center through bow and beyond (22 %)
+  const stringCx = (tip1x + tip2x) / 2;
+  const stringCy = (tip1y + tip2y) / 2;
+  const bowCenterA = bowStart + bowAngle / 2;
+  const bowCx = Math.cos(bowCenterA) * bowR;
+  const bowCy = Math.sin(bowCenterA) * bowR;
+  // Arrow direction: from string center through bow center and beyond
+  const adx = bowCx - stringCx, ady = bowCy - stringCy;
+  const adLen = Math.sqrt(adx * adx + ady * ady);
+  const anx = adx / adLen, any_ = ady / adLen;
+  const arrowLen = 3.2 * S;
+  const arrowStartX = stringCx - anx * 0.3 * S;
+  const arrowStartY = stringCy - any_ * 0.3 * S;
+
+  const arrowN = Math.floor(sn * 0.22);
+  for (let k = 0; k < arrowN; k++) {
+    const t = Math.random();
+    p[i]   = arrowStartX + anx * t * arrowLen + (Math.random() - 0.5) * 0.02;
+    p[i+1] = arrowStartY + any_ * t * arrowLen + (Math.random() - 0.5) * 0.02;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Arrowhead — triangle at tip (10 %)
+  const headBase = 0.15 * S;
+  const headLen = 0.25 * S;
+  const tipX = arrowStartX + anx * arrowLen;
+  const tipY = arrowStartY + any_ * arrowLen;
+  const perpX = -any_, perpY = anx;
+  const headN = Math.floor(sn * 0.10);
+  for (let k = 0; k < headN; k++) {
+    const t = Math.random();
+    const s = (Math.random() - 0.5) * 2;
+    const baseX = tipX - anx * headLen;
+    const baseY = tipY - any_ * headLen;
+    const bx = baseX + perpX * s * headBase;
+    const by = baseY + perpY * s * headBase;
+    p[i]   = bx + (tipX - bx) * t + (Math.random() - 0.5) * 0.015;
+    p[i+1] = by + (tipY - by) * t + (Math.random() - 0.5) * 0.015;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Fletching — feathers at arrow base (8 %)
+  const fletchN = Math.floor(sn * 0.08);
+  for (let k = 0; k < fletchN; k++) {
+    const t = Math.random() * 0.12;
+    const s = (Math.random() - 0.5) * 2;
+    const fw = 0.1 * S * (1 - t * 4);
+    const fx = arrowStartX + anx * t * arrowLen;
+    const fy = arrowStartY + any_ * t * arrowLen;
+    p[i]   = fx + perpX * s * fw + (Math.random() - 0.5) * 0.01;
+    p[i+1] = fy + perpY * s * fw + (Math.random() - 0.5) * 0.01;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Tip decorations / nocks
+  while (i / 3 < sn) {
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.random() * 0.06 * S;
+    p[i]   = stringCx + Math.cos(a) * r;
+    p[i+1] = stringCy + Math.sin(a) * r;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Scatter
+  while (i / 3 < n) {
+    const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
+    const th = Math.random() * Math.PI * 2;
+    const ph = Math.acos(Math.random() * 2 - 1);
+    p[i]   = r * Math.sin(ph) * Math.cos(th);
+    p[i+1] = r * Math.sin(ph) * Math.sin(th);
+    p[i+2] = r * Math.cos(ph);
+    i += 3;
+  }
+  return p;
+}
+
+/* ─── shape: Om (sacred syllable ॐ) ─── */
+
+function omShape(n: number): Float32Array {
+  const p = new Float32Array(n * 3);
+  const sn = Math.floor(n * SHAPE_RATIO);
+  let i = 0;
+
+  // Om is built from a few curves:
+  // 1. Large bottom curve (like a 3)
+  // 2. Upper hook/tail curving right
+  // 3. Small crescent/chandrabindu on top
+  // 4. Dot (bindu) above crescent
+
+  const scale = 1.3 * S;
+
+  // Bottom bowl — large open curve (22 %)
+  const bowlN = Math.floor(sn * 0.22);
+  for (let k = 0; k < bowlN; k++) {
+    const t = Math.random();
+    const a = Math.PI * 0.3 + t * Math.PI * 1.3;
+    const rx = 0.9 * scale, ry = 0.7 * scale;
+    const cx = -0.1 * scale, cy = -0.55 * scale;
+    p[i]   = cx + Math.cos(a) * rx + (Math.random() - 0.5) * 0.04;
+    p[i+1] = cy + Math.sin(a) * ry + (Math.random() - 0.5) * 0.04;
+    p[i+2] = (Math.random() - 0.5) * 0.05;
+    i += 3;
+  }
+
+  // Middle curve — the "3" shape upper half (20 %)
+  const midN = Math.floor(sn * 0.20);
+  for (let k = 0; k < midN; k++) {
+    const t = Math.random();
+    const a = -Math.PI * 0.2 + t * Math.PI * 1.1;
+    const rx = 0.65 * scale, ry = 0.5 * scale;
+    const cx = 0.15 * scale, cy = 0.2 * scale;
+    p[i]   = cx + Math.cos(a) * rx + (Math.random() - 0.5) * 0.04;
+    p[i+1] = cy + Math.sin(a) * ry + (Math.random() - 0.5) * 0.04;
+    p[i+2] = (Math.random() - 0.5) * 0.05;
+    i += 3;
+  }
+
+  // Upper hook / tail sweeping right and up (18 %)
+  const hookN = Math.floor(sn * 0.18);
+  for (let k = 0; k < hookN; k++) {
+    const t = Math.random();
+    const a = Math.PI * 0.5 + t * Math.PI * 0.9;
+    const rx = 0.45 * scale, ry = 0.55 * scale;
+    const cx = 0.55 * scale, cy = 0.7 * scale;
+    p[i]   = cx + Math.cos(a) * rx + (Math.random() - 0.5) * 0.035;
+    p[i+1] = cy + Math.sin(a) * ry + (Math.random() - 0.5) * 0.035;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Vertical stroke connecting curves (10 %)
+  const stemN = Math.floor(sn * 0.10);
+  for (let k = 0; k < stemN; k++) {
+    const t = Math.random();
+    p[i]   = 0.7 * scale + (Math.random() - 0.5) * 0.04;
+    p[i+1] = -0.3 * scale + t * 0.9 * scale;
+    p[i+2] = (Math.random() - 0.5) * 0.04;
+    i += 3;
+  }
+
+  // Crescent (chandrabindu) — small arc above (12 %)
+  const crescentN = Math.floor(sn * 0.12);
+  for (let k = 0; k < crescentN; k++) {
+    const t = Math.random();
+    const a = Math.PI * 0.15 + t * Math.PI * 0.7;
+    const rx = 0.28 * scale, ry = 0.12 * scale;
+    const cx = 0.35 * scale, cy = 1.25 * scale;
+    p[i]   = cx + Math.cos(a) * rx + (Math.random() - 0.5) * 0.025;
+    p[i+1] = cy + Math.sin(a) * ry + (Math.random() - 0.5) * 0.02;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Bindu (dot above crescent)
+  while (i / 3 < sn) {
+    const a = Math.random() * Math.PI * 2;
+    const r = Math.random() * 0.1 * scale;
+    p[i]   = 0.35 * scale + Math.cos(a) * r;
+    p[i+1] = 1.5 * scale + Math.sin(a) * r;
+    p[i+2] = (Math.random() - 0.5) * 0.03;
+    i += 3;
+  }
+
+  // Scatter
+  while (i / 3 < n) {
+    const r = 3.0 + Math.pow(Math.random(), 0.6) * 6;
+    const th = Math.random() * Math.PI * 2;
+    const ph = Math.acos(Math.random() * 2 - 1);
+    p[i]   = r * Math.sin(ph) * Math.cos(th);
     p[i+1] = r * Math.sin(ph) * Math.sin(th);
     p[i+2] = r * Math.cos(ph);
     i += 3;
@@ -428,13 +470,8 @@ export default function StoryCanvas() {
 
         const { float, color, uniform, positionLocal, Fn, mix, time, sin, mul } = TSL;
 
-        // Pre-generate all four shapes
-        const shapes = [
-          cpuShape(COUNT),
-          graphShape(COUNT),
-          coffeeMugShape(COUNT),
-          headphoneShape(COUNT),
-        ];
+        // Single shape — Sudarshan Chakra
+        const shape = chakraShape(COUNT);
 
         // Per-particle data: distance from shape center (for size variation)
         const distFromCenter = new Float32Array(COUNT);
@@ -461,14 +498,13 @@ export default function StoryCanvas() {
         const velocities = new Float32Array(COUNT * 3);
         const phases     = new Float32Array(COUNT);
         const freqs      = new Float32Array(COUNT);
-        const sizes      = new Float32Array(COUNT); // per-particle size factor
+        const sizes      = new Float32Array(COUNT);
 
-        for (let j = 0; j < COUNT * 3; j++) positions[j] = shapes[0][j];
+        for (let j = 0; j < COUNT * 3; j++) positions[j] = shape[j];
         for (let j = 0; j < COUNT; j++) {
           phases[j] = Math.random() * Math.PI * 2;
           freqs[j]  = 0.2 + Math.random() * 0.8;
-          // Vary size: core particles bigger, scatter particles smaller
-          const x = shapes[0][j * 3], y = shapes[0][j * 3 + 1], z = shapes[0][j * 3 + 2];
+          const x = shape[j * 3], y = shape[j * 3 + 1], z = shape[j * 3 + 2];
           const d = Math.sqrt(x * x + y * y + z * z);
           distFromCenter[j] = d;
           sizes[j] = d < 3.0 ? (0.7 + Math.random() * 0.6) : (0.15 + Math.random() * 0.25);
@@ -491,37 +527,37 @@ export default function StoryCanvas() {
         mat.blending        = THREE.AdditiveBlending;
         mat.sizeAttenuation = true;
 
-        // Size varies per particle using the aSize attribute
         const aSizeAttr = TSL.attribute("aSize");
         mat.sizeNode = mul(baseSizeU, aSizeAttr);
 
-        // Rich color palette
-        const pink    = color(0xe94560);
-        const teal    = color(0x30e3ca);
-        const purple  = color(0x7b2fbe);
-        const blue    = color(0x3453fd);
-        const white   = color(0xe4e0ee);
+        // Indian epic color palette
+        const saffron  = color(0xFF9933); // sacred saffron
+        const gold     = color(0xFFD700); // divine gold
+        const crimson  = color(0xDC143C); // shakti red
+        const deepBlue = color(0x1A3A6B); // Krishna blue
+        const ivory    = color(0xFFF8E7); // warm white
 
         mat.colorNode = Fn(() => {
           const ny   = positionLocal.y.add(3.0).div(6.0).clamp(0, 1);
-          const wave = ny.add(sin(mul(time, float(0.15))).mul(0.1));
-          const base = mix(pink, teal, wave.clamp(0, 1));
-          const accent = mix(blue, purple, ny);
-          const blended = mix(base, accent, float(0.25));
-          return mix(blended, white, scrollU.mul(0.2));
+          const wave = ny.add(sin(mul(time, float(0.12))).mul(0.1));
+          const base = mix(saffron, gold, wave.clamp(0, 1));
+          const accent = mix(crimson, deepBlue, ny);
+          const blended = mix(base, accent, float(0.2));
+          return mix(blended, ivory, scrollU.mul(0.15));
         })();
 
-        // Opacity — core particles brighter, scatter particles dimmer
         mat.opacityNode = Fn(() => {
           const sz = aSizeAttr.clamp(0, 1);
           return mix(float(0.18), float(0.72), sz);
         })();
 
         const points = new THREE.Points(geometry, mat);
-        points.position.set(0, 0.3, 0);
-        scene.add(points);
+        const group = new THREE.Group();
+        group.add(points);
+        group.position.set(0, 0.3, 0);
+        scene.add(group);
 
-        // Ambient floating particles — more of them, with depth variation
+        // Ambient floating particles
         const ambCount = 500;
         const ambPos   = new Float32Array(ambCount * 3);
         const ambSpeed = new Float32Array(ambCount);
@@ -544,9 +580,9 @@ export default function StoryCanvas() {
         const ambSizeAttr = TSL.attribute("aSize");
         ambMat.sizeNode        = mul(float(4.0), ambSizeAttr);
         ambMat.colorNode       = Fn(() => {
-          return mix(color(0x30e3ca), color(0x3453fd), sin(mul(time, float(0.3))).mul(0.5).add(0.5));
+          return mix(color(0xFF9933), color(0xFFD700), sin(mul(time, float(0.3))).mul(0.5).add(0.5));
         })();
-        ambMat.opacityNode     = float(0.15);
+        ambMat.opacityNode     = float(0.12);
         scene.add(new THREE.Points(ambGeo, ambMat));
 
         // Listeners
@@ -569,7 +605,6 @@ export default function StoryCanvas() {
         const onMouse = (e: MouseEvent) => {
           mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
           mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
-          // Approximate world-space mouse position at z=0
           mouse.worldX = mouse.x * 5.5;
           mouse.worldY = -mouse.y * 4.0 + 0.3;
         };
@@ -586,15 +621,10 @@ export default function StoryCanvas() {
           prevTime = elapsed;
           const scroll = Math.max(0, Math.min(1, scrollRef.current));
 
-          // ── continuous morph: scroll 0→1 maps to shapes 0→3 ──
-          const raw = scroll * (shapes.length - 1);
-          const shapeIdx = Math.min(Math.floor(raw), shapes.length - 2);
-          let morphT = raw - shapeIdx;
-          // Smoother hermite interpolation
-          morphT = morphT * morphT * morphT * (morphT * (morphT * 6 - 15) + 10);
-
-          const sA = shapes[shapeIdx];
-          const sB = shapes[shapeIdx + 1];
+          // ── rotate chakra on X and Y axes ──
+          group.rotation.x = elapsed * 0.15;
+          group.rotation.y = elapsed * 0.25;
+          group.rotation.z = elapsed * 0.35;
 
           // ── spring-physics position update with mouse repulsion ──
           const stiffness = 0.06;
@@ -606,20 +636,18 @@ export default function StoryCanvas() {
 
           for (let j = 0; j < COUNT; j++) {
             const j3 = j * 3;
-            const tx = sA[j3]   + (sB[j3]   - sA[j3])   * morphT;
-            const ty = sA[j3+1] + (sB[j3+1] - sA[j3+1]) * morphT;
-            const tz = sA[j3+2] + (sB[j3+2] - sA[j3+2]) * morphT;
+            const tx = shape[j3];
+            const ty = shape[j3+1];
+            const tz = shape[j3+2];
 
             const ph = phases[j], fr = freqs[j];
             const dx = Math.sin(elapsed * fr + ph) * 0.025;
             const dy = Math.cos(elapsed * fr * 0.7 + ph + 1.3) * 0.025;
 
-            // Spring toward target
             velocities[j3]   += (tx + dx - positions[j3])   * stiffness;
             velocities[j3+1] += (ty + dy - positions[j3+1]) * stiffness;
             velocities[j3+2] += (tz      - positions[j3+2]) * stiffness;
 
-            // Mouse repulsion (only for core particles, not scatter)
             if (distFromCenter[j] < 3.5) {
               const pmx = positions[j3] - mwx;
               const pmy = positions[j3+1] - mwy;
@@ -639,7 +667,6 @@ export default function StoryCanvas() {
             positions[j3+1] += velocities[j3+1] * dt * 60;
             positions[j3+2] += velocities[j3+2] * dt * 60;
 
-            // Update per-particle size based on current distance
             const cx = positions[j3], cy = positions[j3+1], cz = positions[j3+2];
             const cd = Math.sqrt(cx * cx + cy * cy + cz * cz);
             sizes[j] = cd < 3.0
