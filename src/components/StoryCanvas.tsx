@@ -20,10 +20,10 @@ function chakraShape(n: number): Float32Array {
   const sn = Math.floor(n * SHAPE_RATIO);
   let i = 0;
 
-  const outerR = 1.6 * S;
-  const innerR = 1.2 * S;
-  const hubR = 0.35 * S;
-  const spokes = 12;
+  const outerR = 1.44 * S;
+  const innerR = 1.08 * S;
+  const hubR = 0.30 * S;
+  const spokes = 24;
 
   // Outer ring (20 %)
   const outerN = Math.floor(sn * 0.20);
@@ -47,9 +47,9 @@ function chakraShape(n: number): Float32Array {
     i += 3;
   }
 
-  // Serrated edge — triangular teeth around outer rim (16 %)
-  const teethN = Math.floor(sn * 0.16);
-  const toothCount = 24;
+  // Serrated edge — triangular teeth around outer rim (20 %)
+  const teethN = Math.floor(sn * 0.20);
+  const toothCount = 48;
   for (let k = 0; k < teethN; k++) {
     const ti = Math.floor(Math.random() * toothCount);
     const baseA = (ti / toothCount) * Math.PI * 2;
@@ -75,8 +75,8 @@ function chakraShape(n: number): Float32Array {
     i += 3;
   }
 
-  // Spokes — lines from hub to inner ring (18 %)
-  const spokeN = Math.floor(sn * 0.18);
+  // Spokes — lines from hub to inner ring (20 %)
+  const spokeN = Math.floor(sn * 0.20);
   for (let k = 0; k < spokeN; k++) {
     const si = Math.floor(Math.random() * spokes);
     const a = (si / spokes) * Math.PI * 2;
@@ -88,8 +88,8 @@ function chakraShape(n: number): Float32Array {
     i += 3;
   }
 
-  // Ring fill between inner and outer (12 %)
-  const fillN = Math.floor(sn * 0.12);
+  // Ring fill between inner and outer (8 %)
+  const fillN = Math.floor(sn * 0.08);
   for (let k = 0; k < fillN; k++) {
     const a = Math.random() * Math.PI * 2;
     const r = innerR + Math.random() * (outerR - innerR);
@@ -557,17 +557,17 @@ export default function StoryCanvas() {
         group.position.set(0, 0.3, 0);
         scene.add(group);
 
-        // Ambient floating particles
-        const ambCount = 500;
+        // Streaking space particles — moving past the chakra
+        const ambCount = 1200;
         const ambPos   = new Float32Array(ambCount * 3);
         const ambSpeed = new Float32Array(ambCount);
         const ambSizes = new Float32Array(ambCount);
         for (let j = 0; j < ambCount; j++) {
-          ambPos[j * 3]     = (Math.random() - 0.5) * 24;
-          ambPos[j * 3 + 1] = (Math.random() - 0.5) * 18;
-          ambPos[j * 3 + 2] = (Math.random() - 0.5) * 12;
-          ambSpeed[j] = 0.1 + Math.random() * 0.4;
-          ambSizes[j] = 0.3 + Math.random() * 1.0;
+          ambPos[j * 3]     = (Math.random() - 0.5) * 30;
+          ambPos[j * 3 + 1] = (Math.random() - 0.5) * 20;
+          ambPos[j * 3 + 2] = (Math.random() - 0.5) * 16;
+          ambSpeed[j] = 0.4 + Math.random() * 1.2;
+          ambSizes[j] = 0.2 + Math.random() * 0.8;
         }
         const ambGeo = new THREE.BufferGeometry();
         ambGeo.setAttribute("position", new THREE.BufferAttribute(ambPos, 3));
@@ -578,12 +578,44 @@ export default function StoryCanvas() {
         ambMat.blending        = THREE.AdditiveBlending;
         ambMat.sizeAttenuation = true;
         const ambSizeAttr = TSL.attribute("aSize");
-        ambMat.sizeNode        = mul(float(4.0), ambSizeAttr);
+        ambMat.sizeNode        = mul(float(3.5), ambSizeAttr);
         ambMat.colorNode       = Fn(() => {
           return mix(color(0xFF9933), color(0xFFD700), sin(mul(time, float(0.3))).mul(0.5).add(0.5));
         })();
-        ambMat.opacityNode     = float(0.12);
+        ambMat.opacityNode     = float(0.15);
         scene.add(new THREE.Points(ambGeo, ambMat));
+
+        // Trail particles — streak lines behind chakra motion
+        const trailCount = 800;
+        const trailPos   = new Float32Array(trailCount * 3);
+        const trailSizes = new Float32Array(trailCount);
+        const trailSpeed = new Float32Array(trailCount);
+        for (let j = 0; j < trailCount; j++) {
+          trailPos[j * 3]     = (Math.random() - 0.5) * 6;
+          trailPos[j * 3 + 1] = (Math.random() - 0.5) * 5;
+          trailPos[j * 3 + 2] = -Math.random() * 8 - 1;
+          trailSizes[j] = 0.1 + Math.random() * 0.4;
+          trailSpeed[j] = 1.5 + Math.random() * 3.0;
+        }
+        const trailGeo = new THREE.BufferGeometry();
+        trailGeo.setAttribute("position", new THREE.BufferAttribute(trailPos, 3));
+        trailGeo.setAttribute("aSize", new THREE.BufferAttribute(trailSizes, 1));
+        const trailMat = new THREE.PointsNodeMaterial();
+        trailMat.transparent     = true;
+        trailMat.depthWrite      = false;
+        trailMat.blending        = THREE.AdditiveBlending;
+        trailMat.sizeAttenuation = true;
+        const trailSizeAttr = TSL.attribute("aSize");
+        trailMat.sizeNode    = mul(float(2.5), trailSizeAttr);
+        trailMat.colorNode   = Fn(() => {
+          const d = positionLocal.z.add(9.0).div(8.0).clamp(0, 1);
+          return mix(color(0xDC143C), color(0xD4AF37), d);
+        })();
+        trailMat.opacityNode = Fn(() => {
+          const d = positionLocal.z.add(9.0).div(8.0).clamp(0, 1);
+          return mix(float(0.02), float(0.18), d);
+        })();
+        scene.add(new THREE.Points(trailGeo, trailMat));
 
         // Listeners
         const onScroll = () => {
@@ -681,16 +713,35 @@ export default function StoryCanvas() {
           camera.position.y += (0.5 - mouse.y * 0.3 - camera.position.y) * 0.02;
           camera.lookAt(0, 0.15, 0);
 
-          // ── ambient particles drift ──
+          // ── ambient particles streak past (space travel effect) ──
           const aPos = ambGeo.getAttribute("position");
           for (let j = 0; j < ambCount; j++) {
             const j3 = j * 3;
-            ambPos[j3 + 1] += ambSpeed[j] * 0.0025;
-            ambPos[j3]     += Math.sin(elapsed * ambSpeed[j] * 0.5 + j) * 0.0008;
-            ambPos[j3 + 2] += Math.cos(elapsed * ambSpeed[j] * 0.3 + j * 0.7) * 0.0004;
-            if (ambPos[j3 + 1] > 9) ambPos[j3 + 1] = -9;
+            ambPos[j3] -= ambSpeed[j] * dt * 2.5;
+            ambPos[j3 + 1] += Math.sin(elapsed * ambSpeed[j] * 0.3 + j) * 0.0004;
+            ambPos[j3 + 2] += Math.cos(elapsed * ambSpeed[j] * 0.2 + j * 0.5) * 0.0003;
+            if (ambPos[j3] < -15) {
+              ambPos[j3] = 15;
+              ambPos[j3 + 1] = (Math.random() - 0.5) * 20;
+              ambPos[j3 + 2] = (Math.random() - 0.5) * 16;
+            }
           }
           aPos.needsUpdate = true;
+
+          // ── trail particles rush backward from chakra ──
+          const tPos = trailGeo.getAttribute("position");
+          for (let j = 0; j < trailCount; j++) {
+            const j3 = j * 3;
+            trailPos[j3 + 2] -= trailSpeed[j] * dt;
+            trailPos[j3] += Math.sin(elapsed * 0.5 + j * 0.1) * 0.002;
+            trailPos[j3 + 1] += Math.cos(elapsed * 0.4 + j * 0.15) * 0.002;
+            if (trailPos[j3 + 2] < -9) {
+              trailPos[j3]     = (Math.random() - 0.5) * 4;
+              trailPos[j3 + 1] = (Math.random() - 0.5) * 3.5;
+              trailPos[j3 + 2] = -0.5 - Math.random() * 1.0;
+            }
+          }
+          tPos.needsUpdate = true;
 
           // ── uniforms ──
           scrollU.value = scroll;
@@ -710,6 +761,7 @@ export default function StoryCanvas() {
           cancelAnimationFrame(animationId);
           geometry.dispose(); mat.dispose();
           ambGeo.dispose(); ambMat.dispose();
+          trailGeo.dispose(); trailMat.dispose();
           renderer.dispose();
           if (canvas && container.contains(canvas)) container.removeChild(canvas);
         };

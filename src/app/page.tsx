@@ -1,4 +1,5 @@
 import { Hero } from "@/components/hero";
+import { About } from "@/components/about";
 import { Projects } from "@/components/projects";
 import { Blog } from "@/components/blog";
 import { Contact } from "@/components/contact";
@@ -9,6 +10,7 @@ export default function Home() {
     <main className="min-h-screen text-foreground overflow-x-hidden selection:bg-primary/20">
       <ChapterNav />
       <Hero />
+      <About />
       <Projects />
       <Blog />
       <Contact />

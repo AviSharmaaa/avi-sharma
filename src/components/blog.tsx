@@ -19,17 +19,17 @@ export function Blog() {
 
   return (
     <section id="blog" ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden flex flex-col justify-center">
-      <div aria-hidden className="chapter-watermark" style={{ fontSize: "clamp(10rem, 22vw, 22rem)", top: "-0.15em", left: "-0.05em" }}>02</div>
+      <div aria-hidden className="chapter-watermark" style={{ fontSize: "clamp(10rem, 22vw, 22rem)", top: "-0.15em", left: "-0.05em" }}>03</div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="relative z-10 mx-16 md:mx-26 lg:mx-34">
         <motion.div style={{ y: headingY, opacity: headingOpacity }} className="mb-20">
           <div className="flex items-center gap-4 mb-4">
-            <span className="font-mono text-xs tracking-wider text-[#8B87A0]">CHAPTER II</span>
+            <span className="font-mono text-xs tracking-wider text-white/40">PARVA III</span>
             <div className="accent-line flex-1 max-w-24" />
           </div>
           <div className="flex items-end justify-between gap-8 flex-wrap">
-            <h2 className="font-accent font-black italic leading-[0.9] tracking-tight text-[#E4E0EE]" style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}>Writings</h2>
-            <Link href="https://medium.com/@AviSharmaaa" target="_blank" className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 font-display text-sm uppercase tracking-[0.18em] border border-[#30E3CA]/25 text-[#30E3CA] hover:border-[#30E3CA] hover:text-[#E4E0EE] transition-colors duration-300 mb-2">
+            <h2 className="font-accent font-bold italic leading-[0.9] tracking-tight text-white" style={{ fontSize: "clamp(3rem, 7vw, 6rem)" }}>ज्ञानसार</h2>
+            <Link href="https://medium.com/@AviSharmaaa" target="_blank" className="hidden sm:inline-flex items-center gap-2 px-6 py-2.5 font-display text-sm uppercase tracking-[0.18em] border border-[#D4AF37]/25 text-[#D4AF37] hover:border-[#D4AF37] hover:text-white transition-colors duration-300 mb-2">
               All on Medium
               <svg className="w-3.5 h-3.5" viewBox="0 0 14 14" fill="none"><path d="M2 7 L12 7 M8 3 L12 7 L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
             </Link>
@@ -42,33 +42,33 @@ export function Blog() {
             <motion.div key={i} initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.9, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}>
               <Link href={blog.url} target="_blank" className="group block">
                 <motion.div whileHover={{ x: 8 }} transition={{ duration: 0.3, ease: "easeOut" }} className="relative story-card p-8 lg:p-10">
-                  <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ background: "linear-gradient(to bottom, #E94560, #30E3CA, transparent)" }} />
+                  <div className="absolute left-0 top-0 bottom-0 w-0.5" style={{ background: "linear-gradient(to bottom, #DC143C, #D4AF37, transparent)" }} />
 
                   <div className="flex gap-8 lg:gap-12 items-start">
                     <div className="hidden sm:flex flex-col items-center min-w-20 pt-1">
-                      <span className="font-accent font-black italic text-[#E94560]/25 leading-none tracking-tight" style={{ fontSize: "3.5rem" }}>
+                      <span className="font-accent font-bold italic text-[#DC143C]/25 leading-none tracking-tight" style={{ fontSize: "3.5rem" }}>
                         {blog.date.split(" ")[1] || blog.date}
                       </span>
-                      <span className="font-display text-xs uppercase tracking-[0.2em] text-[#8B87A0] mt-1">
+                      <span className="font-display text-xs uppercase tracking-[0.2em] text-white/40 mt-1">
                         {blog.date.split(" ")[0]}
                       </span>
                     </div>
 
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
-                        <span className="font-mono text-xs tracking-wider text-[#8B87A0]">{blog.year}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#30E3CA]/30" />
-                        <span className="font-mono text-xs tracking-wider text-[#8B87A0]">{blog.readTime}</span>
-                        <span className="sm:hidden font-mono text-xs tracking-wider text-[#8B87A0] ml-auto">{blog.date}</span>
+                        <span className="font-mono text-xs tracking-wider text-white/40">{blog.year}</span>
+                        <span className="w-1 h-1 rounded-full bg-[#D4AF37]/30" />
+                        <span className="font-mono text-xs tracking-wider text-white/40">{blog.readTime}</span>
+                        <span className="sm:hidden font-mono text-xs tracking-wider text-white/40 ml-auto">{blog.date}</span>
                       </div>
 
-                      <h3 className="font-accent font-bold italic tracking-tight text-[#E4E0EE] group-hover:text-[#30E3CA] transition-colors duration-400 leading-tight mb-3" style={{ fontSize: "clamp(1.2rem, 2.2vw, 1.7rem)" }}>
+                      <h3 className="font-accent font-bold italic tracking-tight text-white group-hover:text-[#D4AF37] transition-colors duration-400 leading-tight mb-3" style={{ fontSize: "clamp(1.2rem, 2.2vw, 1.7rem)" }}>
                         {blog.title}
                       </h3>
 
-                      <p className="font-body text-[#A8A3B8] text-sm leading-relaxed mb-5">{blog.summary}</p>
+                      <p className="font-body text-white/60 text-sm leading-relaxed mb-5">{blog.summary}</p>
 
-                      <div className="flex items-center gap-2 text-[#FF6B81] font-display text-xs uppercase tracking-[0.25em] group-hover:gap-4 transition-all duration-300">
+                      <div className="flex items-center gap-2 text-[#D4AF37] font-display text-xs uppercase tracking-[0.25em] group-hover:gap-4 transition-all duration-300">
                         Read Article
                         <svg className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform duration-300" viewBox="0 0 14 14" fill="none">
                           <path d="M2 7 L12 7 M8 3 L12 7 L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -83,7 +83,7 @@ export function Blog() {
         </div>
 
         <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mt-10 sm:hidden">
-          <Link href="https://medium.com/@AviSharmaaa" target="_blank" className="flex items-center justify-center gap-2 py-3.5 font-display text-sm uppercase tracking-[0.18em] border border-[#30E3CA]/35 text-[#30E3CA] w-full">All on Medium</Link>
+          <Link href="https://medium.com/@AviSharmaaa" target="_blank" className="flex items-center justify-center gap-2 py-3.5 font-display text-sm uppercase tracking-[0.18em] border border-[#D4AF37]/35 text-[#D4AF37] w-full">All on Medium</Link>
         </motion.div>
       </div>
     </section>

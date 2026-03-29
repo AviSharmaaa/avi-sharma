@@ -4,10 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 
 const CHAPTERS = [
-  { id: "hero", label: "Prologue" },
-  { id: "projects", label: "I · Build" },
-  { id: "blog", label: "II · Write" },
-  { id: "contact", label: "III · Connect" },
+  { id: "hero", label: "प्रस्तावना" },
+  { id: "experience", label: "I · रणभूमि" },
+  { id: "projects", label: "II · कर्मक्षेत्र" },
+  { id: "blog", label: "III · ज्ञानसार" },
+  { id: "contact", label: "IV · संवाद" },
 ];
 
 export function ChapterNav() {
@@ -63,14 +64,14 @@ export function ChapterNav() {
                 transition={{ duration: 0.2 }}
                 className="absolute right-[calc(100%+12px)] top-1/2 -translate-y-1/2 whitespace-nowrap pointer-events-none"
                 style={{
-                  background: "rgba(8,11,22,0.9)",
-                  border: "1px solid rgba(48,227,202,0.2)",
+                  background: "rgba(12,10,8,0.9)",
+                  border: "1px solid rgba(212,175,55,0.2)",
                   padding: "4px 10px",
-                  fontFamily: "var(--font-geist-mono, monospace)",
-                  fontSize: "10px",
+                  fontFamily: "var(--font-cormorant), serif",
+                  fontSize: "11px",
                   letterSpacing: "0.15em",
                   textTransform: "uppercase",
-                  color: "#E4E0EE",
+                  color: "#FFFFFF",
                 }}
               >
                 {label}
@@ -85,15 +86,15 @@ export function ChapterNav() {
             >
               {isActive ? (
                 <svg width="14" height="14" viewBox="0 0 14 14">
-                  <path d="M7 0 L14 7 L7 14 L0 7 Z" fill="#E94560" />
-                  <path d="M7 3.5 L10.5 7 L7 10.5 L3.5 7 Z" fill="#30E3CA" fillOpacity="0.9" />
+                  <path d="M7 0 L14 7 L7 14 L0 7 Z" fill="#DC143C" />
+                  <path d="M7 3.5 L10.5 7 L7 10.5 L3.5 7 Z" fill="#D4AF37" fillOpacity="0.9" />
                 </svg>
               ) : (
                 <div
                   className="rounded-full transition-colors duration-300"
                   style={{
                     width: 6, height: 6,
-                    background: isHovered ? "rgba(48, 227, 202, 0.6)" : "rgba(139, 135, 160, 0.3)",
+                    background: isHovered ? "rgba(212, 175, 55, 0.6)" : "rgba(255, 255, 255, 0.2)",
                   }}
                 />
               )}

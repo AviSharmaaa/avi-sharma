@@ -1,32 +1,32 @@
 @import 'tailwindcss';
 
 @theme {
-  --font-display: var(--font-rajdhani);
-  --font-body: var(--font-hind);
-  --font-accent: var(--font-playfair);
-  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-cormorant);
+  --font-accent: var(--font-cormorant);
+  --font-mono: var(--font-cormorant);
 }
 
 :root {
-  --background: #080B16;
-  --foreground: #E4E0EE;
-  --card: #10132A;
-  --card-foreground: #E4E0EE;
-  --popover: #10132A;
-  --popover-foreground: #E4E0EE;
-  --primary: #E94560;
-  --primary-foreground: #080B16;
-  --secondary: #533483;
-  --secondary-foreground: #E4E0EE;
-  --muted: #141830;
-  --muted-foreground: #A8A3B8;
-  --accent: #30E3CA;
-  --accent-foreground: #080B16;
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: #1E2245;
-  --input: #141830;
-  --ring: #E94560;
+  --background: #0C0A08;
+  --foreground: #FFFFFF;
+  --card: #161210;
+  --card-foreground: #FFFFFF;
+  --popover: #161210;
+  --popover-foreground: #FFFFFF;
+  --primary: #D4AF37;
+  --primary-foreground: #0C0A08;
+  --secondary: #1E3A5F;
+  --secondary-foreground: #FFFFFF;
+  --muted: #1E1A16;
+  --muted-foreground: #A8A8A8;
+  --accent: #D4AF37;
+  --accent-foreground: #0C0A08;
+  --destructive: #DC143C;
+  --destructive-foreground: #FFFFFF;
+  --border: #2A2420;
+  --input: #1E1A16;
+  --ring: #D4AF37;
   --radius: 0rem;
 }
 
@@ -62,7 +62,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    background-color: #080B16;
+    background-color: #0C0A08;
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -75,23 +75,17 @@
   }
 }
 
-/* ═══════════════════════════════════════════
-   Grain overlay — cinematic texture
-   ═══════════════════════════════════════════ */
 .grain-overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9990;
-  opacity: 0.03;
+  opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
   background-repeat: repeat;
   mix-blend-mode: overlay;
 }
 
-/* ═══════════════════════════════════════════
-   Vivid shimmer gradient text
-   ═══════════════════════════════════════════ */
 @keyframes shimmer {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -100,11 +94,11 @@
 .gold-shimmer {
   background: linear-gradient(
     135deg,
-    #E94560 0%,
-    #30E3CA 30%,
-    #A78BFA 55%,
-    #30E3CA 75%,
-    #E94560 100%
+    #D4AF37 0%,
+    #F5D060 30%,
+    #DC143C 55%,
+    #F5D060 75%,
+    #D4AF37 100%
   );
   background-size: 250% 250%;
   animation: shimmer 4s ease infinite;
@@ -113,24 +107,18 @@
   background-clip: text;
 }
 
-/* ═══════════════════════════════════════════
-   Chapter watermark — giant ghost numbers
-   ═══════════════════════════════════════════ */
 .chapter-watermark {
   position: absolute;
-  font-family: var(--font-playfair), serif;
-  font-weight: 900;
+  font-family: var(--font-cormorant), serif;
+  font-weight: 700;
   font-style: italic;
   line-height: 0.8;
-  color: rgba(48, 227, 202, 0.04);
+  color: rgba(212, 175, 55, 0.05);
   pointer-events: none;
   user-select: none;
   letter-spacing: -0.04em;
 }
 
-/* ═══════════════════════════════════════════
-   Scroll indicator pulse
-   ═══════════════════════════════════════════ */
 @keyframes scroll-pulse {
   0%, 100% { opacity: 0.4; transform: translateY(0); }
   50% { opacity: 1; transform: translateY(8px); }
@@ -140,63 +128,45 @@
   animation: scroll-pulse 2.5s ease-in-out infinite;
 }
 
-/* ═══════════════════════════════════════════
-   Accent line — horizontal rule
-   ═══════════════════════════════════════════ */
 .accent-line {
   height: 1px;
-  background: linear-gradient(to right, #E94560, #30E3CA 40%, transparent);
+  background: linear-gradient(to right, #DC143C, #D4AF37 40%, transparent);
 }
 
 .accent-line-center {
   height: 1px;
-  background: linear-gradient(to right, transparent, #30E3CA 40%, #30E3CA 60%, transparent);
+  background: linear-gradient(to right, transparent, #D4AF37 40%, #D4AF37 60%, transparent);
 }
 
-/* ═══════════════════════════════════════════
-   Editorial card — clean with subtle border
-   ═══════════════════════════════════════════ */
 .story-card {
-  border: 1px solid rgba(48, 227, 202, 0.1);
-  background: rgba(16, 19, 42, 0.7);
+  border: 1px solid rgba(212, 175, 55, 0.1);
+  background: rgba(22, 18, 16, 0.7);
   backdrop-filter: blur(8px);
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .story-card:hover {
-  border-color: rgba(48, 227, 202, 0.3);
+  border-color: rgba(212, 175, 55, 0.3);
   box-shadow:
-    0 0 40px rgba(233, 69, 96, 0.06),
-    0 0 0 1px rgba(48, 227, 202, 0.08);
+    0 0 40px rgba(220, 20, 60, 0.08),
+    0 0 0 1px rgba(212, 175, 55, 0.1);
 }
 
-/* ═══════════════════════════════════════════
-   Dot grid subtle pattern
-   ═══════════════════════════════════════════ */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(48, 227, 202, 0.06) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(212, 175, 55, 0.06) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
-/* ═══════════════════════════════════════════
-   Marquee track
-   ═══════════════════════════════════════════ */
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
 .marquee-track { animation: marquee 28s linear infinite; }
 
-/* ═══════════════════════════════════════════
-   Angled button clip-path
-   ═══════════════════════════════════════════ */
 .btn-angled {
   clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
 }
 
-/* ═══════════════════════════════════════════
-   Section divider with diamond
-   ═══════════════════════════════════════════ */
 .section-divider {
   display: flex;
   align-items: center;
@@ -208,5 +178,5 @@
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(48, 227, 202, 0.2), transparent);
+  background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.25), transparent);
 }

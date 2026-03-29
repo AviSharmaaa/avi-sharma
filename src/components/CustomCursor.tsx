@@ -51,18 +51,18 @@ export default function CustomCursor() {
   return (
     <>
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border border-[#30E3CA]/50"
+        className="fixed top-0 left-0 pointer-events-none z-[9998] rounded-full border border-[#D4AF37]/50"
         style={{
           x: ringX, y: ringY,
           translateX: "-50%", translateY: "-50%",
           width: isHovering ? 48 : 36,
           height: isHovering ? 48 : 36,
-          borderColor: isHovering ? "rgba(233, 69, 96, 0.7)" : "rgba(48, 227, 202, 0.5)",
+          borderColor: isHovering ? "rgba(220, 20, 60, 0.7)" : "rgba(212, 175, 55, 0.5)",
           transition: "width 0.3s, height 0.3s, border-color 0.3s",
         }}
       />
       <motion.div
-        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-[#E94560]"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] rounded-full bg-[#DC143C]"
         style={{
           x: dotX, y: dotY,
           translateX: "-50%", translateY: "-50%",
