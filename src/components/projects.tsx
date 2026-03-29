@@ -256,7 +256,7 @@ export function Projects() {
         02
       </div>
 
-      <div className="relative z-10 mx-16 md:mx-26 lg:mx-34">
+      <div className="relative z-10 mx-6 sm:mx-8 md:mx-26 lg:mx-34">
         <motion.div
           style={{ y: headingY, opacity: headingOpacity }}
           className="mb-20"

@@ -106,7 +106,7 @@ export function About() {
         01
       </div>
 
-      <div className="relative z-10 mx-16 md:mx-26 lg:mx-34">
+      <div className="relative z-10 mx-6 sm:mx-8 md:mx-26 lg:mx-34">
         {/* Heading */}
         <motion.div
           style={{ y: headingY, opacity: headingOpacity }}
@@ -152,7 +152,7 @@ export function About() {
         {/* Stats */}
         <div
           ref={statsRef}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-px border border-[#D4AF37]/10 mb-24"
+          className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-px sm:border sm:border-[#D4AF37]/10 mb-24"
         >
           {stats.map((stat, i) => (
             <motion.div

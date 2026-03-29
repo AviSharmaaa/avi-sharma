@@ -72,7 +72,7 @@ export function Hero() {
           <motion.h1
             variants={fadeUp}
             className="font-accent font-bold italic leading-[0.85] tracking-tight"
-            style={{ y: titleY, opacity: titleOpacity, fontSize: "clamp(5rem, 14vw, 14rem)" }}
+            style={{ y: titleY, opacity: titleOpacity, fontSize: "clamp(3rem, 14vw, 14rem)" }}
           >
             <span className="gold-shimmer">Avi Sharma</span>
           </motion.h1>
@@ -91,7 +91,7 @@ export function Hero() {
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="absolute bottom-0 left-0 right-0 z-10 mx-16 md:mx-26 lg:mx-34 pb-10"
+        className="absolute bottom-0 left-0 right-0 z-10 mx-6 sm:mx-8 md:mx-26 lg:mx-34 pb-10"
       >
         <div>
           <div className="accent-line mb-8" />

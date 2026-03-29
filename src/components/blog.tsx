@@ -21,7 +21,7 @@ export function Blog() {
     <section id="blog" ref={sectionRef} className="relative min-h-screen py-32 overflow-hidden flex flex-col justify-center">
       <div aria-hidden className="chapter-watermark" style={{ fontSize: "clamp(10rem, 22vw, 22rem)", top: "-0.15em", left: "-0.05em" }}>03</div>
 
-      <div className="relative z-10 mx-16 md:mx-26 lg:mx-34">
+      <div className="relative z-10 mx-6 sm:mx-8 md:mx-26 lg:mx-34">
         <motion.div style={{ y: headingY, opacity: headingOpacity }} className="mb-20">
           <div className="flex items-center gap-4 mb-4">
             <span className="font-mono text-xs tracking-wider text-white/40">PARVA III</span>

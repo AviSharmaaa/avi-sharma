@@ -24,7 +24,7 @@ export function Contact() {
     <section id="contact" ref={sectionRef} className="relative min-h-screen py-16 overflow-hidden flex flex-col justify-center" style={{ background: "rgba(12, 10, 8, 0.5)" }}>
       <div aria-hidden className="chapter-watermark" style={{ fontSize: "clamp(10rem, 22vw, 22rem)", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>04</div>
 
-      <div className="relative z-10 mx-16 md:mx-26 lg:mx-34 text-center">
+      <div className="relative z-10 mx-6 sm:mx-8 md:mx-26 lg:mx-34 text-center">
         <motion.div style={{ y: headingY, opacity: headingOpacity }} className="mb-16">
           <div className="flex items-center justify-center gap-4 mb-4">
             <div className="h-px w-8 bg-[#D4AF37]/30" />
