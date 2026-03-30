@@ -8,10 +8,6 @@ const S = 1.2; // global shape scale
 
 /* ─── helpers ─── */
 
-function smoothstep(edge0: number, edge1: number, x: number) {
-  const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
-}
 
 /* ─── shape: Sudarshan Chakra (Krishna's divine disc) ─── */
 
@@ -518,8 +514,6 @@ export default function StoryCanvas() {
         // TSL Material
         const scrollU = uniform(0.0);
         const baseSizeU = uniform(220.0);
-        const mouseXU = uniform(0.0);
-        const mouseYU = uniform(0.0);
 
         const mat = new THREE.PointsNodeMaterial();
         mat.transparent     = true;
@@ -633,15 +627,6 @@ export default function StoryCanvas() {
         };
         window.addEventListener("resize", onResize);
 
-        const mouse = { x: 0, y: 0, worldX: 0, worldY: 0 };
-        const onMouse = (e: MouseEvent) => {
-          mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
-          mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
-          mouse.worldX = mouse.x * 5.5;
-          mouse.worldY = -mouse.y * 4.0 + 0.3;
-        };
-        window.addEventListener("mousemove", onMouse);
-
         // Animation
         const clock = new THREE.Clock();
         let prevTime = 0;
@@ -658,13 +643,9 @@ export default function StoryCanvas() {
           group.rotation.y = elapsed * 0.25;
           group.rotation.z = elapsed * 0.35;
 
-          // ── spring-physics position update with mouse repulsion ──
+          // ── spring-physics position update ──
           const stiffness = 0.06;
           const damping   = 0.86;
-          const mouseRepelRadius = 1.8;
-          const mouseRepelStrength = 0.12;
-          const mwx = mouse.worldX;
-          const mwy = mouse.worldY;
 
           for (let j = 0; j < COUNT; j++) {
             const j3 = j * 3;
@@ -679,17 +660,6 @@ export default function StoryCanvas() {
             velocities[j3]   += (tx + dx - positions[j3])   * stiffness;
             velocities[j3+1] += (ty + dy - positions[j3+1]) * stiffness;
             velocities[j3+2] += (tz      - positions[j3+2]) * stiffness;
-
-            if (distFromCenter[j] < 3.5) {
-              const pmx = positions[j3] - mwx;
-              const pmy = positions[j3+1] - mwy;
-              const md = Math.sqrt(pmx * pmx + pmy * pmy);
-              if (md < mouseRepelRadius && md > 0.01) {
-                const force = smoothstep(mouseRepelRadius, 0, md) * mouseRepelStrength;
-                velocities[j3]   += (pmx / md) * force;
-                velocities[j3+1] += (pmy / md) * force;
-              }
-            }
 
             velocities[j3]   *= damping;
             velocities[j3+1] *= damping;
@@ -708,9 +678,6 @@ export default function StoryCanvas() {
           geometry.attributes.position.needsUpdate = true;
           geometry.attributes.aSize.needsUpdate = true;
 
-          // ── camera: subtle mouse parallax ──
-          camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.02;
-          camera.position.y += (0.5 - mouse.y * 0.3 - camera.position.y) * 0.02;
           camera.lookAt(0, 0.15, 0);
 
           // ── ambient particles streak past (space travel effect) ──
@@ -745,8 +712,6 @@ export default function StoryCanvas() {
 
           // ── uniforms ──
           scrollU.value = scroll;
-          mouseXU.value = mouse.worldX;
-          mouseYU.value = mouse.worldY;
 
           renderer.render(scene, camera);
           animationId = requestAnimationFrame(animate);
@@ -757,7 +722,6 @@ export default function StoryCanvas() {
         return () => {
           window.removeEventListener("scroll", onScroll);
           window.removeEventListener("resize", onResize);
-          window.removeEventListener("mousemove", onMouse);
           cancelAnimationFrame(animationId);
           geometry.dispose(); mat.dispose();
           ambGeo.dispose(); ambMat.dispose();
